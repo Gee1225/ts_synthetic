@@ -43,7 +43,10 @@ st.set_page_config(page_title="Advanced Time Series Forecasting - Only Prints MA
 st.title("🔮 Advanced Forecasting Model")
 
 # ---------- Data Loading ----------
-DATA_PATH = "./data"
+# DATA_PATH = "./data"
+DATA_PATH = "https://raw.githubusercontent.com/Gee1225/ts_synthetic/main/data"
+# https://raw.githubusercontent.com/Gee1225/ts_synthetic/refs/heads/main/data/calendar.csv
+
 @st.cache_data
 def load_data():
     volume = pd.read_csv(f"{DATA_PATH}/volume_log.csv").assign(date=lambda df: pd.to_datetime(df['date']))

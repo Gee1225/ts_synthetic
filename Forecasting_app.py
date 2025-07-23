@@ -37,6 +37,30 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 # except ImportError:
 #     HAVE_PATCHTST = False
 
+
+import importlib
+import subprocess
+import sys
+import streamlit as st
+
+def ensure_tf():
+    """Install TF/Keras on-demand (first LSTM run)."""
+    try:
+        importlib.import_module("tensorflow")
+        importlib.import_module("keras")
+    except ImportError:
+        with st.spinner("Installing TensorFlow/Keras (first run only, ~2–4 mins)..."):
+            cmd = [
+                sys.executable, "-m", "pip", "install",
+                "tensorflow-cpu==2.10.1", "keras==2.10.0", "--no-cache-dir"
+            ]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode != 0:
+                st.error("TensorFlow install failed:\n" + res.stderr[:1500])
+                st.stop()
+        st.success("Install complete. Click 'Run LSTM' again.")
+        st.experimental_rerun()
+
 warnings.filterwarnings("ignore")
 
 st.set_page_config(page_title="Advanced Time Series Forecasting - Only Prints MAE Based on Preset Paramenters", layout="wide")
@@ -122,6 +146,9 @@ elif model_option == 'SARIMA':
 
 # ---------- LSTM ----------
 elif model_option == 'LSTM':
+    ensure_tf()
+    from keras.models import Sequential
+    from keras.layers import LSTM, Dense
     st.subheader("🤖 LSTM Forecast")
     seq_len = st.sidebar.slider("Sequence length", 10, 100, value=30)
     epochs  = st.sidebar.slider("Epochs", 1, 50, value=5)

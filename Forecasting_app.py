@@ -9,9 +9,9 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
 
-# --- Deep Learning (Keras) ---
-from keras.models import Sequential  # type: ignore
-from keras.layers import LSTM, Dense
+# # --- Deep Learning (Keras) ---
+# from keras.models import Sequential  # type: ignore
+# from keras.layers import LSTM, Dense
 
 # --- Classical Time Series ---
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -38,28 +38,28 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 #     HAVE_PATCHTST = False
 
 
-import importlib
-import subprocess
-import sys
-import streamlit as st
+# import importlib
+# import subprocess
+# import sys
+# import streamlit as st
 
-def ensure_tf():
-    """Install TF/Keras on-demand (first LSTM run)."""
-    try:
-        importlib.import_module("tensorflow")
-        importlib.import_module("keras")
-    except ImportError:
-        with st.spinner("Installing TensorFlow/Keras (first run only, ~2–4 mins)..."):
-            cmd = [
-                sys.executable, "-m", "pip", "install",
-                "tensorflow-cpu==2.10.1", "keras==2.10.0", "--no-cache-dir"
-            ]
-            res = subprocess.run(cmd, capture_output=True, text=True)
-            if res.returncode != 0:
-                st.error("TensorFlow install failed:\n" + res.stderr[:1500])
-                st.stop()
-        st.success("Install complete. Click 'Run LSTM' again.")
-        st.experimental_rerun()
+# def ensure_tf():
+#     """Install TF/Keras on-demand (first LSTM run)."""
+#     try:
+#         importlib.import_module("tensorflow")
+#         importlib.import_module("keras")
+#     except ImportError:
+#         with st.spinner("Installing TensorFlow/Keras (first run only, ~2–4 mins)..."):
+#             cmd = [
+#                 sys.executable, "-m", "pip", "install",
+#                 "tensorflow-cpu==2.10.1", "keras==2.10.0", "--no-cache-dir"
+#             ]
+#             res = subprocess.run(cmd, capture_output=True, text=True)
+#             if res.returncode != 0:
+#                 st.error("TensorFlow install failed:\n" + res.stderr[:1500])
+#                 st.stop()
+#         st.success("Install complete. Click 'Run LSTM' again.")
+#         st.experimental_rerun()
 
 warnings.filterwarnings("ignore")
 
@@ -112,7 +112,7 @@ def prepare_xgb():
 # ---------- Sidebar & Selector ----------
 st.sidebar.title("🛠 Select Forecasting Model")
 model_option = st.sidebar.selectbox(
-    "Model", ['XGBoost','SARIMA','LSTM']
+    "Model", ['XGBoost','SARIMA']
 )
 
 # ---------- XGBoost ----------
@@ -144,31 +144,31 @@ elif model_option == 'SARIMA':
         preds = res.fittedvalues
         st.success(f"✅ SARIMA MAE: {mean_absolute_error(sku_ts['outbound_volume'][1:], preds[1:]):.2f}")
 
-# ---------- LSTM ----------
-elif model_option == 'LSTM':
-    ensure_tf()
-    from keras.models import Sequential
-    from keras.layers import LSTM, Dense
-    st.subheader("🤖 LSTM Forecast")
-    seq_len = st.sidebar.slider("Sequence length", 10, 100, value=30)
-    epochs  = st.sidebar.slider("Epochs", 1, 50, value=5)
-    if st.sidebar.button("Run LSTM"):
-        sku_ts = volume.query("center_id=='C001' and sku_id=='SKU001'").set_index('date')
-        arr = sku_ts['outbound_volume'].values.reshape(-1,1)
-        scaler = MinMaxScaler().fit(arr)
-        scaled = scaler.transform(arr)
-        Xs, ys = [], []
-        for i in range(seq_len, len(scaled)):
-            Xs.append(scaled[i-seq_len:i, 0])
-            ys.append(scaled[i, 0])
-        Xs = np.array(Xs).reshape(-1, seq_len, 1)
-        ys = np.array(ys).reshape(-1, 1)
-        model = Sequential([LSTM(50, input_shape=(seq_len,1)), Dense(1)])
-        model.compile(optimizer='adam', loss='mse')
-        model.fit(Xs, ys, epochs=epochs, verbose=0)
-        preds = scaler.inverse_transform(model.predict(Xs))
-        true  = scaler.inverse_transform(ys)
-        st.success(f"✅ LSTM MAE: {mean_absolute_error(true, preds):.2f}")
+# # ---------- LSTM ----------
+# elif model_option == 'LSTM':
+#     ensure_tf()
+#     from keras.models import Sequential
+#     from keras.layers import LSTM, Dense
+#     st.subheader("🤖 LSTM Forecast")
+#     seq_len = st.sidebar.slider("Sequence length", 10, 100, value=30)
+#     epochs  = st.sidebar.slider("Epochs", 1, 50, value=5)
+#     if st.sidebar.button("Run LSTM"):
+#         sku_ts = volume.query("center_id=='C001' and sku_id=='SKU001'").set_index('date')
+#         arr = sku_ts['outbound_volume'].values.reshape(-1,1)
+#         scaler = MinMaxScaler().fit(arr)
+#         scaled = scaler.transform(arr)
+#         Xs, ys = [], []
+#         for i in range(seq_len, len(scaled)):
+#             Xs.append(scaled[i-seq_len:i, 0])
+#             ys.append(scaled[i, 0])
+#         Xs = np.array(Xs).reshape(-1, seq_len, 1)
+#         ys = np.array(ys).reshape(-1, 1)
+#         model = Sequential([LSTM(50, input_shape=(seq_len,1)), Dense(1)])
+#         model.compile(optimizer='adam', loss='mse')
+#         model.fit(Xs, ys, epochs=epochs, verbose=0)
+#         preds = scaler.inverse_transform(model.predict(Xs))
+#         true  = scaler.inverse_transform(ys)
+#         st.success(f"✅ LSTM MAE: {mean_absolute_error(true, preds):.2f}")
 
 # ---------- Temporal Fusion Transformer ----------
 # elif model_option == 'Temporal Fusion Transformer':

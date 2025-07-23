@@ -1,55 +1,27 @@
-# # ts_synthetic/requirements.txt
-# # ---- Core ----
-# streamlit==1.32.2
-# pandas==2.2.2
-# numpy==1.26.4
-# scikit-learn==1.4.2
-# statsmodels==0.14.1
-
-# # ---- PyTorch stack ----
-# torch==2.2.2
-# pytorch-lightning==2.2.5
-# pytorch-forecasting==1.0.0   # 0.10.5 also works if you prefer
-# torchmetrics==1.3.2
-
-# # ---- Hugging Face / PatchTST ----
-# transformers==4.41.2
-# datasets==2.19.0
-# accelerate==0.30.1
-# tensorflow-cpu==2.12.0
-# keras==2.12.0
-
-
-# # ---- Misc utils you likely use ----
-# python-dateutil>=2.8.2
-
-
-# ---- Misc utils you likely use ----
-python-dateutil>=2.8.2
-
-
-
---only-binary=:all:
-# --extra-index-url https://download.pytorch.org/whl/cpu
-
-# Core
+# ts_synthetic/requirements.txt
+# ---- Core ----
 streamlit==1.32.2
 pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.4.2
-statsmodels==0.14.2
-python-dateutil==2.9.0.post0
+statsmodels==0.14.1
 
-# PyTorch stack
-torch==2.2.2+cpu
+# ---- PyTorch stack ----
+torch==2.2.2
+pytorch-lightning==2.2.5
+pytorch-forecasting==1.0.0   # 0.10.5 also works if you prefer
 torchmetrics==1.3.2
-lightning==2.2.5
-pytorch-forecasting==1.0.0
 
-# HF / PatchTST
-transformers==4.40.0
-tokenizers==0.15.2
+# ---- Hugging Face / PatchTST ----
+transformers==4.41.2
 datasets==2.19.0
 accelerate==0.30.1
-# tensorflow-cpu==2.12.0
-# keras==2.12.0
+tensorflow-cpu==2.12.0
+keras==2.12.0
+
+
+# ---- Misc utils you likely use ----
+python-dateutil>=2.8.2
+matplotlib>=3.7.1
+seaborn>=0.12.2
+plotly>=5.15.0

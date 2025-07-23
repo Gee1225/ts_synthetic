@@ -1,0 +1,154 @@
+backcast_loss_ratio: 0.1
+context_length: 30
+dataset_parameters:
+  add_encoder_length: false
+  add_relative_time_idx: false
+  add_target_scales: false
+  allow_missing_timesteps: false
+  categorical_encoders:
+    __group_id__group: !!python/object:pytorch_forecasting.data.encoders.NaNLabelEncoder
+      add_nan: false
+      classes_:
+        SKU001: 0
+        SKU002: 1
+        SKU003: 2
+        SKU004: 3
+        SKU005: 4
+        SKU006: 5
+        SKU007: 6
+        SKU008: 7
+        SKU009: 8
+        SKU010: 9
+        SKU011: 10
+        SKU012: 11
+        SKU013: 12
+        SKU014: 13
+        SKU015: 14
+        SKU016: 15
+        SKU017: 16
+        SKU018: 17
+        SKU019: 18
+        SKU020: 19
+      classes_vector_: !!python/object/apply:numpy.core.multiarray._reconstruct
+        args:
+        - !!python/name:numpy.ndarray ''
+        - !!python/tuple
+          - 0
+        - !!binary |
+          Yg==
+        state: !!python/tuple
+        - 1
+        - !!python/tuple
+          - 20
+        - !!python/object/apply:numpy.dtype
+          args:
+          - U6
+          - false
+          - true
+          state: !!python/tuple
+          - 3
+          - <
+          - null
+          - null
+          - null
+          - 24
+          - 4
+          - 8
+        - false
+        - !!binary |
+          UwAAAEsAAABVAAAAMAAAADAAAAAxAAAAUwAAAEsAAABVAAAAMAAAADAAAAAyAAAAUwAAAEsAAABV
+          AAAAMAAAADAAAAAzAAAAUwAAAEsAAABVAAAAMAAAADAAAAA0AAAAUwAAAEsAAABVAAAAMAAAADAA
+          AAA1AAAAUwAAAEsAAABVAAAAMAAAADAAAAA2AAAAUwAAAEsAAABVAAAAMAAAADAAAAA3AAAAUwAA
+          AEsAAABVAAAAMAAAADAAAAA4AAAAUwAAAEsAAABVAAAAMAAAADAAAAA5AAAAUwAAAEsAAABVAAAA
+          MAAAADEAAAAwAAAAUwAAAEsAAABVAAAAMAAAADEAAAAxAAAAUwAAAEsAAABVAAAAMAAAADEAAAAy
+          AAAAUwAAAEsAAABVAAAAMAAAADEAAAAzAAAAUwAAAEsAAABVAAAAMAAAADEAAAA0AAAAUwAAAEsA
+          AABVAAAAMAAAADEAAAA1AAAAUwAAAEsAAABVAAAAMAAAADEAAAA2AAAAUwAAAEsAAABVAAAAMAAA
+          ADEAAAA3AAAAUwAAAEsAAABVAAAAMAAAADEAAAA4AAAAUwAAAEsAAABVAAAAMAAAADEAAAA5AAAA
+          UwAAAEsAAABVAAAAMAAAADIAAAAwAAAA
+      warn: true
+  constant_fill_strategy: null
+  group_ids:
+  - group
+  lags: null
+  max_encoder_length: 30
+  max_prediction_length: 7
+  min_encoder_length: 30
+  min_prediction_idx: 0
+  min_prediction_length: 7
+  predict_mode: false
+  randomize_length: null
+  scalers: {}
+  static_categoricals: null
+  static_reals: null
+  target: log_vol
+  target_normalizer: &id002 !!python/object:pytorch_forecasting.data.encoders.EncoderNormalizer
+    _method_kwargs: {}
+    center: true
+    center_: !!python/object/apply:numpy.core.multiarray.scalar
+    - &id001 !!python/object/apply:numpy.dtype
+      args:
+      - f8
+      - false
+      - true
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - !!binary |
+      yu5OnXnYEUA=
+    max_length: null
+    method: standard
+    method_kwargs: {}
+    scale_: !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      AQ3iNJ+O1D8=
+    transformation: null
+  time_idx: time_idx
+  time_varying_known_categoricals: null
+  time_varying_known_reals: null
+  time_varying_unknown_categoricals: null
+  time_varying_unknown_reals:
+  - log_vol
+  variable_groups: null
+  weight: null
+dropout: 0.1
+expansion_coefficient_lengths:
+- 3
+- 7
+learning_rate: 0.03
+log_gradient_flow: false
+log_interval: 10
+log_val_interval: 1
+monotone_constraints: {}
+num_block_layers:
+- 3
+- 3
+num_blocks:
+- 3
+- 3
+optimizer: adam
+optimizer_params: null
+output_transformer: *id002
+prediction_length: 7
+reduce_on_plateau_min_lr: 1.0e-05
+reduce_on_plateau_patience: 1000
+reduce_on_plateau_reduction: 2.0
+sharing:
+- true
+- true
+stack_types:
+- trend
+- seasonality
+weight_decay: 0.01
+widths:
+- 32
+- 512
+- 512
+- 512
+- 32

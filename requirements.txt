@@ -1,3 +1,5 @@
+# ts_synthetic/requirements.txt
+
 # Core data & ML
 streamlit>=1.0
 pandas>=1.3
@@ -5,12 +7,19 @@ numpy>=1.21
 scikit-learn>=1.0
 statsmodels>=0.13
 
-# Deep learning
+# Deep learning (Keras + TensorFlow)
 keras>=2.8
+tensorflow-macos>=2.11.0    # for M2 Mac
+tensorflow-metal>=0.6.0     # GPU support on Mac
+# OR on Linux/CPU-only: “tensorflow-cpu>=2.11.0”
+
+# PyTorch & Lightning
 torch>=2.0
 pytorch-lightning>=2.0
 pytorch-forecasting>=0.13
 
 # Hugging Face (PatchTST support)
-transformers[time-series]>=4.38
+transformers>=4.38
 datasets>=2.10
+
+

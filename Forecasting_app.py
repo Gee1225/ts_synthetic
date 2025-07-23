@@ -17,25 +17,25 @@ from keras.layers import LSTM, Dense
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 # --- PyTorch & Lightning Compatibility ---
-import torch
-from torch import nn
-from torch.utils.data import Dataset
-import lightning.pytorch as pl
-from lightning.pytorch import Trainer
-from lightning.pytorch.callbacks import EarlyStopping
+# import torch
+# from torch import nn
+# from torch.utils.data import Dataset
+# import lightning.pytorch as pl
+# from lightning.pytorch import Trainer
+# from lightning.pytorch.callbacks import EarlyStopping
 
 # --- PyTorch Forecasting Models ---
-from pytorch_forecasting.models.nbeats import NBeats
-from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
-from pytorch_forecasting.metrics import SMAPE, MAE
+# from pytorch_forecasting.models.nbeats import NBeats
+# from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
+# from pytorch_forecasting.metrics import SMAPE, MAE
 
 # --- Transformers & HF Datasets (guarded import) ---
-try:
-    from transformers import PatchTSTConfig, PatchTSForTimeSeriesForecasting, PatchTSTFeatureExtractor
-    from datasets import Dataset as HFDataset
-    HAVE_PATCHTST = True
-except ImportError:
-    HAVE_PATCHTST = False
+# try:
+#     from transformers import PatchTSTConfig, PatchTSForTimeSeriesForecasting, PatchTSTFeatureExtractor
+#     from datasets import Dataset as HFDataset
+#     HAVE_PATCHTST = True
+# except ImportError:
+#     HAVE_PATCHTST = False
 
 warnings.filterwarnings("ignore")
 
@@ -45,7 +45,6 @@ st.title("🔮 Advanced Forecasting Model")
 # ---------- Data Loading ----------
 # DATA_PATH = "./data"
 DATA_PATH = "https://raw.githubusercontent.com/Gee1225/ts_synthetic/main/data"
-# https://raw.githubusercontent.com/Gee1225/ts_synthetic/refs/heads/main/data/calendar.csv
 
 @st.cache_data
 def load_data():
@@ -89,7 +88,7 @@ def prepare_xgb():
 # ---------- Sidebar & Selector ----------
 st.sidebar.title("🛠 Select Forecasting Model")
 model_option = st.sidebar.selectbox(
-    "Model", ['XGBoost','Temporal Fusion Transformer','N-BEATS','PATCHTST','SARIMA','LSTM']
+    "Model", ['XGBoost','SARIMA','LSTM']
 )
 
 # ---------- XGBoost ----------
@@ -145,100 +144,39 @@ elif model_option == 'LSTM':
         st.success(f"✅ LSTM MAE: {mean_absolute_error(true, preds):.2f}")
 
 # ---------- Temporal Fusion Transformer ----------
-
-
-elif model_option == 'Temporal Fusion Transformer':
-    st.subheader("🧠 TFT Forecast")
-    epochs = st.sidebar.slider("Epochs", 1, 10, value=3)
-    if st.sidebar.button("Run TFT"):
-        # prepare dataset
-        df = (
-            volume[volume['center_id']=='C001'][['date','sku_id','outbound_volume']]
-            .assign(
-                time_idx=lambda d: (d['date'] - d['date'].min()).dt.days,
-                group=lambda d: d['sku_id'],
-                log_vol=lambda d: np.log1p(d['outbound_volume'])
-            )
-        )
-        ds = TimeSeriesDataSet(
-            df, time_idx='time_idx', target='log_vol', group_ids=['group'],
-            max_encoder_length=30, max_prediction_length=7,
-            time_varying_unknown_reals=['log_vol']
-        )
-        loader = ds.to_dataloader(train=True, batch_size=64, num_workers=0)
-        tft = TemporalFusionTransformer.from_dataset(ds, loss=MAE())
-        trainer = Trainer(max_epochs=epochs, accelerator='auto', devices=1,
-                         enable_checkpointing=False, gradient_clip_val=0.1,
-                         callbacks=[EarlyStopping(monitor='train_loss', patience=3)])
-        trainer.fit(model=tft, train_dataloaders=loader)
-        # fix: move to CPU before numpy
-        preds_all = tft.predict(loader).cpu().numpy()
-        preds_1 = preds_all[:, 0]
-        actuals = df['log_vol'].values[30:30 + len(preds_1)]
-        mae_tft = mean_absolute_error(np.expm1(actuals), np.expm1(preds_1))
-        st.info(f"⚙️ TFT MAE (h=1): {mae_tft:.2f}")
+# elif model_option == 'Temporal Fusion Transformer':
+#     st.subheader("🧠 TFT Forecast")
+#     epochs = st.sidebar.slider("Epochs", 1, 10, value=3)
+#     if st.sidebar.button("Run TFT"):
+#         df = (
+#             volume[volume['center_id']=='C001'][['date','sku_id','outbound_volume']]
+#             .assign(
+#                 time_idx=lambda d: (d['date'] - d['date'].min()).dt.days,
+#                 group=lambda d: d['sku_id'],
+#                 log_vol=lambda d: np.log1p(d['outbound_volume'])
+#             )
+#         )
+#         ds = TimeSeriesDataSet(
+#             df, time_idx='time_idx', target='log_vol', group_ids=['group'],
+#             max_encoder_length=30, max_prediction_length=7,
+#             time_varying_unknown_reals=['log_vol']
+#         )
+#         loader = ds.to_dataloader(train=True, batch_size=64, num_workers=0)
+#         tft = TemporalFusionTransformer.from_dataset(ds, loss=MAE())
+#         trainer = Trainer(max_epochs=epochs, accelerator='auto', devices=1,
+#                          enable_checkpointing=False, gradient_clip_val=0.1,
+#                          callbacks=[EarlyStopping(monitor='train_loss', patience=3)])
+#         trainer.fit(model=tft, train_dataloaders=loader)
+#         preds_all = tft.predict(loader).cpu().numpy()
+#         preds_1 = preds_all[:, 0]
+#         actuals = df['log_vol'].values[30:30 + len(preds_1)]
+#         mae_tft = mean_absolute_error(np.expm1(actuals), np.expm1(preds_1))
+#         st.info(f"⚙️ TFT MAE (h=1): {mae_tft:.2f}")
 
 # ---------- N-BEATS ----------
-elif model_option == 'N-BEATS':
-    st.subheader("📐 N-BEATS Forecast")
-    epochs = st.sidebar.slider("Epochs", 1, 10, value=3)
-    if st.sidebar.button("Run N-BEATS"):
-        # prepare dataset
-        df = (
-            volume[volume['center_id']=='C001'][['date','sku_id','outbound_volume']]
-            .assign(
-                time_idx=lambda d: (d['date'] - d['date'].min()).dt.days,
-                group=lambda d: d['sku_id'],
-                log_vol=lambda d: np.log1p(d['outbound_volume'])
-            )
-        )
-        ds = TimeSeriesDataSet(
-            df, time_idx='time_idx', target='log_vol', group_ids=['group'],
-            max_encoder_length=30, max_prediction_length=7,
-            time_varying_unknown_reals=['log_vol']
-        )
-        loader = ds.to_dataloader(train=True, batch_size=64, num_workers=0)
-        nbeats_model = NBeats.from_dataset(ds, learning_rate=0.03, log_interval=10,
-                                          log_val_interval=1, weight_decay=1e-2,
-                                          widths=[32,512,512,512,32], backcast_loss_ratio=0.1,
-                                          loss=MAE())
-        trainer = Trainer(max_epochs=epochs, accelerator='auto', devices=1,
-                         enable_checkpointing=False, gradient_clip_val=0.1,
-                         callbacks=[EarlyStopping(monitor='train_loss', patience=3)])
-        trainer.fit(model=nbeats_model, train_dataloaders=loader)
-        preds_all = nbeats_model.predict(loader).cpu().numpy()
-        preds_1 = preds_all[:, 0]
-        actuals = df['log_vol'].values[30:30 + len(preds_1)]
-        mae_nb = mean_absolute_error(np.expm1(actuals), np.expm1(preds_1))
-        st.info(f"⚙️ N-BEATS MAE (h=1): {mae_nb:.2f}")
-
-# ---------- PATCHTST ----------
-elif model_option == 'PATCHTST':
-    st.subheader("🧩 PATCHTST Forecast")
-    if st.sidebar.button("Run PATCHTST"):
-        if not HAVE_PATCHTST:
-            st.error("PatchTST not available. Upgrade transformers & datasets.")
-        else:
-            df = (
-                volume[volume['center_id']=='C001'][['date','sku_id','outbound_volume']]
-                .assign(
-                    time_idx=lambda d: (d['date'] - d['date'].min()).dt.days,
-                    log_vol=lambda d: np.log1p(d['outbound_volume'])
-                )
-            )
-            patch_df = df[['time_idx','log_vol']].rename(columns={'time_idx':'past_time_features','log_vol':'target'})
-            hf_ds = HFDataset.from_pandas(patch_df)
-            extractor = PatchTSTFeatureExtractor(seq_length=30, prediction_length=7)
-            enc = extractor(hf_ds[:], return_tensors='pt')
-            patch_model = PatchTSForTimeSeriesForecasting.from_pretrained('microsoft/patchtst-base')
-            patch_model.eval()
-            with torch.no_grad():
-                out = patch_model(
-                    past_time_features=enc['past_time_features'],
-                    past_target=enc['past_target'],
-                    future_time_features=enc['future_time_features']
-                )
-            preds = out.predictions.squeeze().cpu().numpy()
-            actuals = patch_df['target'].values
-            mae_pt = mean_absolute_error(actuals, preds)
-            st.info(f"⚙️ PATCHTST MAE: {mae_pt:.2f}")
+# elif model_option == 'N-BEATS':
+#     st.subheader("📐 N-BEATS Forecast")
+#     epochs = st.sidebar.slider("Epochs", 1, 10, value=3)
+#     if st.sidebar.button("Run N-BEATS"):
+#         df = (
+#             volume[volume['center_id']=='C001'][['date','sku_id','outbo_]()]()_]()]()

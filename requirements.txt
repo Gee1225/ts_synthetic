@@ -1,4 +1,5 @@
 # ts_synthetic/requirements.txt
+
 # ---- Core ----
 streamlit==1.32.2
 pandas==2.2.2
@@ -6,22 +7,23 @@ numpy==1.26.4
 scikit-learn==1.4.2
 statsmodels==0.14.1
 
-# ---- PyTorch stack ----
-torch==2.2.2
-pytorch-lightning==2.2.5
-pytorch-forecasting==1.0.0   # 0.10.5 also works if you prefer
-torchmetrics==1.3.2
-
-# ---- Hugging Face / PatchTST ----
-transformers==4.41.2
-datasets==2.19.0
-accelerate==0.30.1
+# ---- Needed for LSTM (Keras runs on TensorFlow) ----
 tensorflow-cpu==2.12.0
 keras==2.12.0
 
-
 # ---- Misc utils you likely use ----
 python-dateutil>=2.8.2
-matplotlib>=3.7.1
-seaborn>=0.12.2
-plotly>=5.15.0
+# matplotlib>=3.7.1
+# seaborn>=0.12.2
+# plotly>=5.15.0
+
+# ---- PyTorch stack (COMMENTED OUT) ----
+# torch==2.2.2
+# pytorch-lightning==2.2.5
+# pytorch-forecasting==1.0.0   # 0.10.5 also works if you prefer
+# torchmetrics==1.3.2
+
+# ---- Hugging Face / PatchTST (COMMENTED OUT) ----
+# transformers==4.41.2
+# datasets==2.19.0
+# accelerate==0.30.1

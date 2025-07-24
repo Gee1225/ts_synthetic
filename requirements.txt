@@ -1,8 +1,9 @@
 # ts_synthetic/requirements.txt
+--extra-index-url https://pypi.org/simple
 
 streamlit==1.32.2
-pandas==2.2.2
 numpy==1.26.4
+pandas==2.2.1
 scikit-learn==1.4.2
 statsmodels==0.14.1
 python-dateutil>=2.8.2
